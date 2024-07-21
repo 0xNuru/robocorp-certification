@@ -32,4 +32,14 @@ def load_traffic_data_table():
 
     return tables.create_table(data["value"])
 
+def filter_and_sort_traffic_data(data):
+    rate_key = "NumericValue"
+    max_rate = 5.0
+    gender_key = "Dim1"
+    both_genders = "BTSX"
+    year_key = "TimeDim"
+    tables.filter_table_by_column(data, rate_key, "<", max_rate)
+    tables.filter_table_by_column(data, gender_key, "==", both_genders)
+    tables.sort_table_by_column(data, year_key, False)
+
 
