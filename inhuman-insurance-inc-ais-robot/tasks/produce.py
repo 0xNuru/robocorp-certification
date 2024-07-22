@@ -2,7 +2,6 @@ import json
 import os
 
 from dotenv import load_dotenv
-from robocorp.tasks import task
 from robocorp import workitems
 from RPA.HTTP import HTTP
 
@@ -17,7 +16,6 @@ COUNTRY_KEY = "SpatialDim"
 YEAR_KEY = "TimeDim"
 BOTH_GENDERS = "BTSX"
 
-@task
 def produce_traffic_data():
     try:
         http.download(
@@ -26,7 +24,7 @@ def produce_traffic_data():
         overwrite=True,
         )
     except Exception as e:
-        print(f"Failed to download traffic data: {e}")
+        print(f"Failed to download traffic data: {e} \n" * 3)
         return
 
     traffic_data = load_traffic_data_table()
@@ -36,9 +34,6 @@ def produce_traffic_data():
 
     print("produce")
 
-@task
-def consume_traffic_data():
-    print("consume")
 
 def load_traffic_data_table():
     """load traffic data from json into a table"""
