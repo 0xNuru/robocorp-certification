@@ -3,22 +3,37 @@ import os
 
 from dotenv import load_dotenv
 from robocorp.tasks import task
+from robocorp import workitems
 from RPA.HTTP import HTTP
-from RPA.Tables import Tables
 
 load_dotenv()
 
 http = HTTP()
-tables = Tables()
+
+RATE_KEY = "NumericValue"
+MAX_RATE = 5.0
+GENDER_KEY = "Dim1"
+COUNTRY_KEY = "SpatialDim"
+YEAR_KEY = "TimeDim"
+BOTH_GENDERS = "BTSX"
 
 @task
 def produce_traffic_data():
-    http.download(
+    try:
+        http.download(
         url=os.getenv("TRAFFIC_DATA_DOWNLOAD_URL"),
         target_file="output/traffic.json",
         overwrite=True,
-    )
-    traffic_data_table = load_traffic_data_table()
+        )
+    except Exception as e:
+        print(f"Failed to download traffic data: {e}")
+        return
+
+    traffic_data = load_traffic_data_table()
+    filtered_and_sorted_traffic_data = filter_and_sort_traffic_data(traffic_data)
+    payloads = create_payloads(filtered_and_sorted_traffic_data)
+    save_work_item_payloads(payloads)
+
     print("produce")
 
 @task
