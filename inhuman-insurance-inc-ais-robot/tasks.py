@@ -45,16 +45,35 @@ def load_traffic_data_table():
     with open(os.getenv("TRAFFIC_DATA_JSON_PATH")) as file:
         data = json.load(file)
 
-    return tables.create_table(data["value"])
+    return data["value"]
 
 def filter_and_sort_traffic_data(data):
-    rate_key = "NumericValue"
-    max_rate = 5.0
-    gender_key = "Dim1"
-    both_genders = "BTSX"
-    year_key = "TimeDim"
-    tables.filter_table_by_column(data, rate_key, "<", max_rate)
-    tables.filter_table_by_column(data, gender_key, "==", both_genders)
-    tables.sort_table_by_column(data, year_key, False)
+    data = [item for item in data if item[RATE_KEY] < MAX_RATE and item[GENDER_KEY] == BOTH_GENDERS]
+    data = sorted(data, key= lambda x: (-x[YEAR_KEY], x[COUNTRY_KEY]))
+    latest_data = {}
+    for item in data:
+        country = item[COUNTRY_KEY]
+        if country not in latest_data:
+            latest_data[country] = item
+    
+    latest_data_list = list(latest_data.values())
+    
+    return latest_data_list
 
+def create_payloads(data) -> list:
+    payloads = []
+    for item in data:
+        payloads.append({
+            "year": item[YEAR_KEY],
+            "country": item[COUNTRY_KEY],
+            "rate": item[RATE_KEY],
+        })
+    return payloads
+
+def save_work_item_payloads(payloads):
+    for payload in payloads:
+        work_item = dict(payload)
+        workitems.outputs.create(work_item)
+    
+        
 
