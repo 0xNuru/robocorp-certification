@@ -5,6 +5,8 @@ from dotenv import load_dotenv
 from robocorp import workitems
 from RPA.HTTP import HTTP
 
+from schema.api import Payload
+
 load_dotenv()
 
 http = HTTP()
